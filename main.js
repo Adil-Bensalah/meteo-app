@@ -4,17 +4,20 @@ const container = document.querySelector('.container')
 if ('geolocation' in navigator) {
   navigator.geolocation.watchPosition((position) => {
 
-    let url = `https://api.openweathermap.org/data/2.5/onecall?lat=${position.coords.latitude}&lon=${position.coords.longitude}&exclude=minutely&appid=dc8c9152e8adaad0ec8bf635818c0d42&units=metric`
-    axios.get(url)
+
+  let url = `https://api.openweathermap.org/data/2.5/onecall?lat=${position.coords.latitude}&lon=${position.coords.longitude}&exclude=minutely&units=metric&lang=fr&appid=dc8c9152e8adaad0ec8bf635818c0d42&units=metric`
+ console.log(url)
+  axios.get(url)
        .then(requete => {
         blockInfo(requete)
         hourlyTemp(requete)
         dailyTemp(requete)
       })
-      .catch(error =>
+      .catch(error =>{
         container.innerHTML = 
-        `<p class="errorMsg"> Une erreur ses produite veiller revenir plutard</p>`
-      )
+        `<p class="errorMsg"> ${error} </p>`
+  })
+
 
   }, error)
 
@@ -49,13 +52,13 @@ function hourlyTemp(requete) {
   hour.shift()
   temp.shift()
 
-  const result = []
+  const array = []
   const time = hour.forEach(element => {
   const hours = new Date(element * 1000)
   const time = hours.getHours()
-  result.push(time)
+  array.push(time)
   });
-
+  const result =array.slice(0,24)
   ShowHourlyResult(result, temp)
 }
 
@@ -64,14 +67,16 @@ const hourNameBlocks   = document.querySelectorAll(".hour-name")
 
 function ShowHourlyResult(hour, temp) {
 
-  hourNameBlocks.forEach((block, index,) => {
-    if (hour[index] === 0) {
-      hourNameBlocks[index].textContent = "00h";
-    }
-    else {
-      hourNameBlocks[index].textContent = `${hour[index * 3]}h`
-    }
+const newArray = hour.map(function(number){
+if (number === 0) {
+  return number = "00" 
+}
+return number
+})
 
+  hourNameBlocks.forEach( (block,index) => {
+
+    hourNameBlocks[index].textContent = `${newArray[index * 3]}h`
     hourTemperatures[index].textContent = `${Math.round(temp[index * 3])}°`
   })
 
